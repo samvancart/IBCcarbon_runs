@@ -101,7 +101,15 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
     sampleX <- rbind(sampleX,selX)
     
     sampleX$segID <- sampleX$maakuntaID
-    sampleX <- sampleX[N != 0] # Remove rows where N = 0
+    
+    x0 <- which(sampleX$N==0)
+    
+    # If there are no rows where N=0 then return -all_rows
+    if(length(x0) == 0) {
+      x0 <- -c(1:nrow(sampleX))
+    }
+    sampleX <- sampleX[-x0]
+    
     segIDs <- sampleX$segID
     if(is.null(initSoilCreStart) | 
        (harvScen %in% c("protect","protectNoAdH","protectTapio") & 
