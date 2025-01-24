@@ -987,7 +987,7 @@ sample_data.f = function(data.all, nSample) {
 create_prebas_input.f = function(r_no, clim, data.sample, nYears,
                                  startingYear=0,domSPrun=0,
                                  harv, HcFactorX=HcFactor, reStartYear=1,
-                                 outModReStart=NULL,initSoilC=NULL,latitude=NA
+                                 outModReStart=NULL,initSoilC=NULL,latitude=NA,
                                  pCrobasX,pPrelesX) { 
   # dat = climscendataset
   #domSPrun=0 initialize model for mixed forests according to data inputs 
