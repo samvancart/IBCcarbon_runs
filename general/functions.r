@@ -17,7 +17,10 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                      outModReStart=NULL,reStartYear=1,
                      sampleX=NULL,deadWoodCalc=TRUE,
                      harvLimDef=list(),
-                     clCutDef=NA, latitude=NA){
+                     clCutDef=NA, latitude=NA,
+                    pPRELES=pPRELES,
+                    pCrobasX = pCROB,
+                    pPrelesX = pPREL){
 
   # outType determines the type of output:
   # dTabs -> standard run, mod outputs saved as data.tables 
@@ -241,7 +244,9 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                                      startingYear = startingYear,domSPrun=domSPrun,
                                      harv=harvScen, HcFactorX=HcFactor,
                                      initSoilC=initSoilCreStart, reStartYear=reStartYear,
-                                     outModReStart=outModReStart)
+                                     outModReStart=outModReStart, 
+                                      pCROBAS = pCrobasX,
+                                    pPRELES = pPrelesx)
   
   if(outType %in% c("uncRun","uncSeg")){
     initPrebas$pPRELES <- pPRELES
@@ -983,7 +988,7 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
                                  startingYear=0,domSPrun=0,
                                  harv, HcFactorX=HcFactor, reStartYear=1,
                                  outModReStart=NULL,initSoilC=NULL,latitude=NA
-                                 ) { 
+                                 pCrobasX,pPrelesX) { 
   # dat = climscendataset
   #domSPrun=0 initialize model for mixed forests according to data inputs 
   #domSPrun=1 initialize model only for dominant species 
@@ -1193,6 +1198,7 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   initPrebas <- InitMultiSite(nYearsMS = rep(nYears,nSites),siteInfo=siteInfo,
                               # litterSize = litterSize,#pAWEN = parsAWEN,
                               pCROBAS = pCrobasX,
+                              pPRELES=pPrelesX,
                               defaultThin=defaultThin,
                               ClCut = ClCut, areas =areas,
                               energyCut = energyCut, 
