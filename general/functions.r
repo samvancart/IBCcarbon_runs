@@ -245,8 +245,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                                      harv=harvScen, HcFactorX=HcFactor,
                                      initSoilC=initSoilCreStart, reStartYear=reStartYear,
                                      outModReStart=outModReStart, 
-                                      pCROBAS = pCrobasX,
-                                    pPRELES = pPrelesx)
+                                     pCrobasX = pCrobasX,
+                                     pPrelesX = pPrelesX)
   
   if(outType %in% c("uncRun","uncSeg")){
     initPrebas$pPRELES <- pPRELES
