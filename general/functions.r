@@ -1823,16 +1823,14 @@ updatePclcut <- function(initPrebas,pClCut){
   inDclct <- initPrebas$inDclct
   inAclct <- initPrebas$inAclct
   for(i in 1: nSites){
-    if(ClCut[i]==1) inDclct[i,] <-
+    if(ClCut[i]==1) inDclct[i,1:3] <-
         c(ClCutD_Pine(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_pine),
           ClCutD_Spruce(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_spruce),
-          ClCutD_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch),
-          0,0,0,0,0,0,0,0,0)  ###"fasy","pipi","eugl","rops","popu",'eugrur','piab(DE)',"quIl","fasy(Boreal)")
+          ClCutD_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch))
     if(ClCut[i]==1) inAclct[i,] <-
         c(ClCutA_Pine(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_pine),
           ClCutA_Spruce(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_spruce),
-          ClCutA_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch),
-          80,50,13,30,50,13,120,100,80)  ###"fasy","pipi","eugl","rops","popu",'eugrur','piab(DE)',"quIl","fasy(Boreal)")
+          ClCutA_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch))
   }
   return(list(inDclct=inDclct,inAclct=inAclct))
 }
