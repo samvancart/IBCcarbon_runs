@@ -693,24 +693,6 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
     marginX= 1:2#(length(dim(out$annual[,,varSel,]))-1)
     
     
-    
-    #### TEST SAVE initPrebas ##################################
-    
-    
-    initPrebas_path <- paste0(path_output, "/outputDT/forCent",r_no,"/",
-                "initPrebas",
-                "_harscen",harvScen,
-                "_harInten",harvInten,"_",
-                rcpfile,"_","sampleID",sampleID,".rdata")
-    
-    save(initPrebas, file = initPrebas_path)
-    
-    
-    #### END TEST SAVE initPrebas ##################################
-
-    
-    
-    
     for (ij in 1:length(varSel)) {
       print(paste0("varSel ", varSel[ij]))
       if(funX[ij]=="baWmean"){
