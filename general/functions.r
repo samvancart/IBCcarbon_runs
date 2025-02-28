@@ -1834,19 +1834,21 @@ calNewDclcut <- function(out,
 updatePclcut <- function(initPrebas,pClCut){
   nSites <- initPrebas$nSites
   ClCut <- initPrebas$ClCut
-  inDclct <- initPrebas$inDclct
   ETSmean <- rowMeans(initPrebas$ETSy)
   ETSthres <- 1000
   climIDs <- initPrebas$siteInfo[,2]
   siteType <- initPrebas$siteInfo[,3]
-  inDclct <- initPrebas$inDclct
-  inAclct <- initPrebas$inAclct
+  
+  # Create matrices of NAs
+  inDclct <- matrix(nrow = nSites, ncol = 3) 
+  inAclct <- matrix(nrow = nSites, ncol = 3)
+  
   for(i in 1: nSites){
-    if(ClCut[i]==1) inDclct[i,1:3] <-
+    if(ClCut[i]==1) inDclct[i, 1:3] <-
         c(ClCutD_Pine(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_pine),
           ClCutD_Spruce(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_spruce),
           ClCutD_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch))
-    if(ClCut[i]==1) inAclct[i,1:3] <-
+    if(ClCut[i]==1) inAclct[i, 1:3] <-
         c(ClCutA_Pine(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_pine),
           ClCutA_Spruce(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_spruce),
           ClCutA_Birch(ETSmean[climIDs[i]],ETSthres,siteType[i],pClcut= pClCut$ClCut_birch))
