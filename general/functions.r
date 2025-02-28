@@ -20,7 +20,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                      clCutDef=NA, latitude=NA,
                     pPRELES=pPRELES,
                     pCrobasX = pCROB,
-                    pPrelesX = pPREL){
+                    pPrelesX = pPREL,
+                    save_init_kuntanielu = FALSE){
 
   # outType determines the type of output:
   # dTabs -> standard run, mod outputs saved as data.tables 
@@ -691,6 +692,23 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
   if(outType=="kuntaNielu"){
     ####create pdf for test plots 
     marginX= 1:2#(length(dim(out$annual[,,varSel,]))-1)
+    
+    
+    
+    #### TEST SAVE initPrebas ##################################
+    
+    if(save_init_kuntanielu) {
+      initPrebas_path <- paste0(path_output, "/outputDT/forCent",r_no,"/",
+                                "initPrebas",
+                                "_harscen",harvScen,
+                                "_harInten",harvInten,"_",
+                                rcpfile,"_","sampleID",sampleID,".rdata")
+      
+      save(initPrebas, file = initPrebas_path)
+    }
+
+    #### END TEST SAVE initPrebas ##################################
+    
     
     
     for (ij in 1:length(varSel)) {
