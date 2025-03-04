@@ -1944,11 +1944,15 @@ get_or_create_path <- function(pathVarName, defaultDir, subDir="") {
   } else {
     mainDir <- eval(parse(text=pathVarName))
     path <- file.path(mainDir, subDir)
-    print(paste0("Creating ", pathVarName, " in ", path))
-    dir.create(path = path, recursive = T, showWarnings = F)
+    if(!dir_exists(path)) {
+      print(paste0("Creating ", pathVarName, " in ", path))
+      dir.create(path = path, recursive = T) 
+    } else {
+      print(paste0(pathVarName, " already exists in ", path))
+    }
     path <- mainDir
   }
   return(path)
-} 
+}  
 
 
