@@ -21,7 +21,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                     pPRELES=pPRELES,
                     pCrobasX = pCROB,
                     pPrelesX = pPREL,
-                    save_init_kuntanielu = FALSE){
+                    save_init_kuntanielu = FALSE,
+                    is_hc_from_foliage = TRUE){
 
   # outType determines the type of output:
   # dTabs -> standard run, mod outputs saved as data.tables 
@@ -247,7 +248,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                                      initSoilC=initSoilCreStart, reStartYear=reStartYear,
                                      outModReStart=outModReStart, 
                                      pCrobasX = pCrobasX,
-                                     pPrelesX = pPrelesX)
+                                     pPrelesX = pPrelesX,
+                                     is_hc_from_foliage = is_hc_from_foliage)
   
   if(outType %in% c("uncRun","uncSeg")){
     initPrebas$pPRELES <- pPRELES
@@ -1004,10 +1006,10 @@ sample_data.f = function(data.all, nSample) {
 
 # StartingYear = climate data that detrermines simulation period must have year greater than this.
 create_prebas_input.f = function(r_no, clim, data.sample, nYears,
-                                 startingYear=0,domSPrun=0,
+                                 startingYear=0, domSPrun=0,
                                  harv, HcFactorX=HcFactor, reStartYear=1,
-                                 outModReStart=NULL,initSoilC=NULL,latitude=NA,
-                                 pCrobasX,pPrelesX) { 
+                                 outModReStart=NULL, initSoilC=NULL, latitude=NA,
+                                 pCrobasX, pPrelesX, is_hc_from_foliage = TRUE) { 
   # dat = climscendataset
   #domSPrun=0 initialize model for mixed forests according to data inputs 
   #domSPrun=1 initialize model only for dominant species 
@@ -1213,7 +1215,25 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   ## Set to match climate data years
   if(!exists("ftTapioParX")) ftTapioParX = ftTapio
   if(!exists("tTapioParX")) tTapioParX = tTapio
-  initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
+  
+  # Hc calculation
+  if(is_hc_from_foliage) {
+    print(paste("is_hc_from_foliage: ", is_hc_from_foliage))
+    old_initVar <- copy(initVar)
+    
+    initVar <- derive_hc_from_foliage_mass_wrapper(initVar = initVar, 
+                                                   data.sample = data.sample, 
+                                                   pCROB = pCrobasX)
+    
+    
+    is_initVar_modified <- !setequal(initVar[,6,], old_initVar[,6,])
+    print(paste0("is_initVar_modified: ", is_initVar_modified))
+    
+  } else {
+    initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
+  }
+  
+  
   initPrebas <- InitMultiSite(nYearsMS = rep(nYears,nSites),siteInfo=siteInfo,
                               # litterSize = litterSize,#pAWEN = parsAWEN,
                               pCROBAS = pCrobasX,
@@ -1955,4 +1975,95 @@ get_or_create_path <- function(pathVarName, defaultDir, subDir="") {
   return(path)
 }  
 
+
+# Hc_from_foliage functions ---------------------------------------------------------
+
+# Helper for derive_hc_from_foliage_mass_wrapper function
+calculate_hc <- function(data.sample, pCROB) {
+  
+  # Get hc for all rows and species in a matrix
+  hc <- data.sample[, fHc_fol(dbh, ba, h, pCROB), by = .I] |>
+    dcast(I ~ rowid(I), value.var = "V1") |>
+    as.matrix()
+  
+  return(hc[, -1])  # Drop the first column
+}
+
+# Helper for derive_hc_from_foliage_mass_wrapper function
+calculate_adjusted_hc <- function(initVar_row, hc_vec, data_sample_row) {
+  if(data_sample_row$h == 0) {
+    return(c(0, 0, 0))
+  } 
+  
+  # Adjust hc to new value. If new value < 0.2 default to 0.2
+  adjusted_hc <- pmax(initVar_row[3, ] / data_sample_row$h * hc_vec, 0.2)
+  
+  return(adjusted_hc)
+}
+
+# Helper for derive_hc_from_foliage_mass_wrapper function
+update_initVar_hc <- function(initVar, hc, data.sample) {
+  
+  # Validate inputs -------------------------------------
+  if (!is.matrix(hc)) stop("hc must be a matrix.")
+  if (nrow(initVar) != nrow(hc)) stop("initVar and hc must have the same number of rows.")
+  
+  
+  # Iterate over rows and update initVar ------------------------------------
+  
+  
+  sapply(1:nrow(initVar), function(i) {
+    
+    # Extract hc_values for the current row
+    hc_vec <- hc[i, initVar[i, 1, ]]
+    
+    # Adjust hc according to original height
+    adjusted_hc <- calculate_adjusted_hc(initVar[i, , ], hc_vec, data.sample[i, ])
+    
+    if(any(adjusted_hc == 0)) {
+      warning(paste0("data.sample column 'h' is zero at row ", i, "."))
+    }
+    
+    # Assign to parent using <<-
+    initVar[i, 6, ] <<- adjusted_hc 
+  })
+  
+  
+  # Return ------------------------------------------------------------------
+  
+  return(initVar)
+}
+
+
+# Wrapper to call Rprebasso function 'fHc' that derives height to crown base (Hc) from foliage mass.
+# Returns initVar filled with the new values for Hc that have been further adjusted using the original height in initVar.
+derive_hc_from_foliage_mass_wrapper <- function(initVar, data.sample, pCROB) {
+  
+  
+  # Input validations -------------------------------------------------------
+  
+  
+  if(!is.numeric(pCROB)) stop("pCROB must be numeric.")
+  if (length(dim(initVar)) != 3) stop("initVar must be a 3D array with dimensions (rows, columns, slices).")
+  if (!"data.table" %in% class(data.sample)) stop("data.sample must be a data.table.")
+  required_columns <- c("h", "ba", "dbh")
+  missing_columns <- setdiff(required_columns, colnames(data.sample))
+  if(length(missing_columns > 0)) stop("data.sample must contain columns h, ba and dbh.")
+  if (nrow(initVar) != nrow(data.sample)) stop("initVar and hc must have the same number of rows.")
+  
+  
+  # Call functions ----------------------------------------------------------
+  
+  
+  # Calculate hc
+  hc <- calculate_hc(data.sample, pCROB)
+  
+  # Update hc in initVar
+  initVar <- update_initVar_hc(initVar, hc, data.sample)
+  
+  
+  # Return ------------------------------------------------------------------
+  
+  return(initVar)
+}
 
