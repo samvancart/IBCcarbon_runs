@@ -1218,16 +1218,9 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   
   # Hc calculation
   if(is_hc_from_foliage) {
-    print(paste("is_hc_from_foliage: ", is_hc_from_foliage))
-    old_initVar <- copy(initVar)
-    
     initVar <- derive_hc_from_foliage_mass_wrapper(initVar = initVar, 
                                                    data.sample = data.sample, 
                                                    pCROB = pCrobasX)
-    
-    
-    is_initVar_modified <- !setequal(initVar[,6,], old_initVar[,6,])
-    print(paste0("is_initVar_modified: ", is_initVar_modified))
     
   } else {
     initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
