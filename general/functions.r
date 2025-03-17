@@ -1215,10 +1215,6 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   if(!exists("tTapioParX")) tTapioParX = tTapio
   initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
 
-  ### SAVE INIT VAR
-  save(data.sample, initVar, siteInfo, file = "/scratch/project_2000994/PREBASruns/finRuns/Rsrc/samuel/llindfors/initVars.rdata")
-  ####
-  
   initPrebas <- InitMultiSite(nYearsMS = rep(nYears,nSites),siteInfo=siteInfo,
                               # litterSize = litterSize,#pAWEN = parsAWEN,
                               pCROBAS = pCrobasX,
