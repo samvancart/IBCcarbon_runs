@@ -1243,7 +1243,8 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
                               CO2=clim$CO2[, 1:(nYears*365)],
                               yassoRun = 1,
                               mortMod = mortMod,
-                              latitude=latitude)
+                              latitude=latitude,
+                              ECMmod = 1, pCN_alfar= parsCN_alfar, alpharVersion = 1, alpharNcalc = T) # TEMP PARAMS
   
   if(!is.null(outModReStart)){
 
