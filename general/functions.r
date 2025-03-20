@@ -1225,6 +1225,13 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   } else {
     initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
   }
+  
+  init_save_path <- "scratch/project_2000994/PREBASruns/finRuns/Rsrc/samuel/llindfors/initMultiSiteParams.rdata"
+  
+  print("saving init files") 
+  save_list <- c("siteInfo", "initVar", "clim", "pCrobasX", "pPrelesX")
+  save(list = save_list, file = init_save_path)
+  
 
   initPrebas <- InitMultiSite(nYearsMS = rep(nYears,nSites),siteInfo=siteInfo,
                               # litterSize = litterSize,#pAWEN = parsAWEN,
