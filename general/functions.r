@@ -1226,9 +1226,9 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
     initVar[,6,] <- aaply(initVar,1,findHcNAs,pHcM,pCrobasX,HcModVx)[,6,]*HcFactorX
   }
   
-  init_save_path <- paste0(path_output)
   
-  
+  # TEST SAVE
+  init_save_path <- paste0(path_output, "/initMulti.rdata")
   print("saving init files") 
   save_list <- c("siteInfo", "initVar", "clim", "pCrobasX", "pPrelesX")
   save(list = save_list, file = init_save_path)
