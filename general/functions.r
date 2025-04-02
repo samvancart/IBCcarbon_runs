@@ -697,19 +697,19 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
     
     
     
-    #### TEST SAVE initPrebas ##################################
+    #### TEST SAVE multiOut ##################################
     
     if(save_init_kuntanielu) {
-      initPrebas_path <- paste0(path_output, "/outputDT/forCent",r_no,"/",
-                                "initPrebas",
+      multiOut_path <- paste0(path_output, "/outputDT/forCent",r_no,"/",
+                                "multiOut",
                                 "_harscen",harvScen,
                                 "_harInten",harvInten,"_",
                                 rcpfile,"_","sampleID",sampleID,".rdata")
       
-      save(initPrebas, file = initPrebas_path)
+      save(region$multiOut, file = multiOut_path)
     }
 
-    #### END TEST SAVE initPrebas ##################################
+    #### END TEST SAVE multiOut ##################################
     
     
     
