@@ -706,7 +706,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                                 "_harInten",harvInten,"_",
                                 rcpfile,"_","sampleID",sampleID,".rdata")
       
-      save(region$multiOut, file = multiOut_path)
+      multiOut <- region$multiOut
+      save(multiOut, file = multiOut_path)
     }
 
     #### END TEST SAVE multiOut ##################################
