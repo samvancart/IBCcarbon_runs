@@ -249,7 +249,8 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
                                      outModReStart=outModReStart, 
                                      pCrobasX = pCrobasX,
                                      pPrelesX = pPrelesX,
-                                     is_hc_from_foliage = is_hc_from_foliage)
+                                     is_hc_from_foliage = is_hc_from_foliage,
+                                     latitude = latitude)
   
   if(outType %in% c("uncRun","uncSeg")){
     initPrebas$pPRELES <- pPRELES
@@ -1228,11 +1229,11 @@ create_prebas_input.f = function(r_no, clim, data.sample, nYears,
   }
   
   
-  # TEST SAVE
-  init_save_path <- paste0(path_output, "/initMulti.rdata")
-  print("saving init files") 
-  save_list <- c("siteInfo", "initVar", "clim", "pCrobasX", "pPrelesX")
-  save(list = save_list, file = init_save_path)
+  # # TEST SAVE
+  # init_save_path <- paste0(path_output, "/initMulti.rdata")
+  # print("saving init files") 
+  # save_list <- c("siteInfo", "initVar", "clim", "pCrobasX", "pPrelesX")
+  # save(list = save_list, file = init_save_path)
   
 
   initPrebas <- InitMultiSite(nYearsMS = rep(nYears,nSites),siteInfo=siteInfo,
