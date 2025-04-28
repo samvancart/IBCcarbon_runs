@@ -86,15 +86,17 @@ runModel <- function(sampleID, outType="dTabs", uncRCP=0,
     posX <- which(sampleX$maakuntaID %in% xDat$maakuntaID)
     maakX <- sampleX[posX]$maakuntaID
     selX <- data.table()
-    for(ijf in 1:length(posX)){
+    for(ijf in 1:length(posX)){ 
       newCons <- xDat[!maakuntaID %in% maakX[ijf] & oldMaakID %in% maakX[ijf]]
-      newCons$area <- sampleX$area[posX[ijf]] * newCons$areaProp
-      newCons$N <- sampleX$N[posX[ijf]] * newCons$areaProp
+      newCons$N <- round(sampleX$N[posX[ijf]] * newCons$areaProp)
+      newCons[,area:=N*16^2/10000]
       
-      sampleX[posX[ijf]]$area <- sampleX[posX[ijf]]$area * (1-newCons$areaProp)
-      sampleX[posX[ijf]]$N <- sampleX[posX[ijf]]$N * (1-newCons$areaProp)
+      sampleX[posX[ijf]]$N <- sampleX[posX[ijf]]$N - newCons$N
+      sampleX[posX[ijf]][,area:=N*16^2/10000]
       
       selX <- rbind(selX,newCons)
+      
+      latitude <- c(latitude, latitude[posX[ijf]]) # CHECK THIS!!!
     }
     
     namesCol <- intersect(names(sampleX),names(selX))
@@ -963,7 +965,7 @@ runModOut <- function(sampleID, sampleX,modOut,r_no,harvScen,harvInten,rcpfile,a
 
 
 
-sample_data.f = function(data.all, nSample) {
+sample_data.f <- function(data.all, nSample) {
   cloudpixels = data.all[, sum(ba==32766)]
   nonforest = data.all[, sum(ba==32767)]
   forest = data.all[, sum(ba< 32766)]
@@ -980,8 +982,9 @@ sample_data.f = function(data.all, nSample) {
   
   # summary(data.sample[, 3:11])
   
-  for (col in colnames(data.sample)[c(3, 5:11)]) set(data.sample, j=col,
-                                                     value=as.double(data.sample[[col]]))
+  double_cols <- c("ba", "age", "dbh", "pine", "spruce", "birch", "decid", "fert", "h")
+  data.sample[, (double_cols) := lapply(.SD, as.double), .SDcols = double_cols]
+  
   
   ## -----------------------------------------------------------------
   
